@@ -1,0 +1,14 @@
+tup=("hjth","hthttt","htht")
+print(tup[-1])
+y=list(tup)
+y[1]="jbnk"
+tup=tuple(y)
+print(tup)
+u=("ouu",)
+tup+=u
+print(tup)
+(gg,*hh,htt)=tup
+print(hh)
+#methods
+print(tup.count("hjth"))
+print(tup.index("ouu"))
