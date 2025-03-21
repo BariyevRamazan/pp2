@@ -1,5 +1,8 @@
-import os
-import string
-for i in range(26):
-    u=string.ascii_uppercase
-    os.remove(f"{u[i]}.txt")
+list_1 = []
+for _ in range(9):
+    a = str(input())
+    list_1.append(a)
+list_1.reverse()
+print("")
+for a in list_1:
+    print(a)
