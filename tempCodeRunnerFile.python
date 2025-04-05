@@ -1,8 +1,12 @@
-list_1 = []
-for _ in range(9):
-    a = str(input())
-    list_1.append(a)
-list_1.reverse()
-print("")
-for a in list_1:
-    print(a)
+import pygame
+pygame.init()
+screen = pygame.display.set_mode((500,500))
+pygame.display.set_caption("KOD Begemot")
+running = True
+while running:
+    pygame.display.update()
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+    

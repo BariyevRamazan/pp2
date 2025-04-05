@@ -25,5 +25,4 @@ while done:
     scr.fill((255,255,255))
     pygame.draw.circle(scr,(255,0,0),(x,y),radius=r)
     pygame.display.update()
-    pygame.display.flip()
     clock.tick(60)

@@ -30,4 +30,3 @@ while done:
     scr.blit(lh,lp)
     scr.blit(rh,rp)
     pygame.display.update()
-    pygame.display.flip()
