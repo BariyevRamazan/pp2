@@ -157,9 +157,6 @@ d = a + " " + b
 print(c)
 print(d)
 #-----------------------------------------------------------------------------------
-age = 36
-txt = "My name is John, I am " + age
-print(txt)
 
 #  F-Strings
 age = 36

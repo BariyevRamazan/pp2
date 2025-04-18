@@ -1,12 +1,124 @@
-import pygame
-pygame.init()
-screen = pygame.display.set_mode((500,500))
-pygame.display.set_caption("KOD Begemot")
-running = True
-while running:
-    pygame.display.update()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-            pygame.quit()
-    
+import psycopg2
+import csv
+
+# Подключение к базе данных
+conn = psycopg2.connect(
+    dbname="postgres",
+    user="postgres",
+    password="kot13",
+    host="localhost",
+    port="5432"
+)
+cur = conn.cursor()
+
+# 1. Создание таблицы
+def create_table():
+    cur.execute("""
+        CREATE TABLE BETTER_CALL_SOUL (
+            id SERIAL PRIMARY KEY,
+            first_name VARCHAR(50),
+            phone VARCHAR(15)
+        );
+    """)
+    conn.commit()
+    print("Table created.")
+
+# 2. Вставка данных из CSV
+def insert_from_csv():
+    with open("phonebook.csv", newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            cur.execute(
+                "INSERT INTO BETTER_CALL_SOUL (first_name, phone) VALUES (%s, %s)",
+                (row['first_name'], row['phone'])
+            )
+    conn.commit()
+    print("Data inserted from CSV.")
+
+# 3. Ввод данных вручную
+def insert_from_console():
+    name = input("Enter name: ")
+    phone = input("Enter phone: ")
+    cur.execute(
+        "INSERT INTO BETTER_CALL_SOUL (first_name, phone) VALUES (%s, %s)",
+        (name, phone)
+    )
+    conn.commit()
+    print("Inserted manually.")
+
+# 4. Обновление данных
+def update_entry():
+    choice = input("Update (1) name or (2) phone? ")
+    if choice == "1":
+        old_name = input("Old name: ")
+        new_name = input("New name: ")
+        cur.execute("UPDATE BETTER_CALL_SOUL SET first_name = %s WHERE first_name = %s", (new_name, old_name))
+    elif choice == "2":
+        old_phone = input("Old phone: ")
+        new_phone = input("New phone: ")
+        cur.execute("UPDATE BETTER_CALL_SOUL SET phone = %s WHERE phone = %s", (new_phone, old_phone))
+    else:
+        print("Invalid choice.")
+        return
+    conn.commit()
+    print("Data updated.")
+
+# 5. Поиск
+def search_entries():
+    choice = input("Search by (1) name or (2) phone? ")
+    if choice == "1":
+        name = input("Enter name: ")
+        cur.execute("SELECT * FROM BETTER_CALL_SOUL WHERE first_name ILIKE %s", (f"%{name}%",))
+    elif choice == "2":
+        phone = input("Enter phone: ")
+        cur.execute("SELECT * FROM BETTER_CALL_SOUL WHERE phone LIKE %s", (f"%{phone}%",))
+    else:
+        print("Invalid choice.")
+        return
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+
+# 6. Удаление
+def delete_entry():
+    choice = input("Delete by (1) name or (2) phone? ")
+    if choice == "1":
+        name = input("Enter name to delete: ")
+        cur.execute("DELETE FROM BETTER_CALL_SOUL WHERE first_name = %s", (name,))
+    elif choice == "2":
+        phone = input("Enter phone to delete: ")
+        cur.execute("DELETE FROM BETTER_CALL_SOUL WHERE phone = %s", (phone,))
+    else:
+        print("Invalid choice.")
+        return
+    conn.commit()
+    print("Entry deleted.")
+
+# Меню
+def menu():
+    while True:
+        print("\n1. Create Table\n2. Insert from CSV\n3. Insert from Console\n4. Update Entry\n5. Search\n6. Delete\n0. Exit")
+        option = input("Choose option: ")
+        if option == "1":
+            create_table()
+        elif option == "2":
+            insert_from_csv()
+        elif option == "3":
+            insert_from_console()
+        elif option == "4":
+            update_entry()
+        elif option == "5":
+            search_entries()
+        elif option == "6":
+            delete_entry()
+        elif option == "0":
+            break
+        else:
+            print("Invalid option.")
+
+# Запуск
+menu()
+
+# Закрытие соединения
+cur.close()
+conn.close()

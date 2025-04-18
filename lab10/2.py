@@ -2,7 +2,37 @@ import pygame
 import sys
 import random
 import time
+import psycopg2
 
+
+conn = psycopg2.connect(
+    dbname="postgres",
+    user="postgres",
+    password="kot13",
+    host="localhost",
+    port="5432"
+)
+cur = conn.cursor()
+
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS user_data (
+        username VARCHAR(50) PRIMARY KEY,
+        score INTEGER DEFAULT 0,
+        level INTEGER DEFAULT 0
+    )
+""")
+conn.commit()
+username = input("Enter username: ")
+cur.execute("SELECT score, level FROM user_data WHERE username = %s", (username,))
+user = cur.fetchone()
+
+if user:
+    points, levels = user
+    print(f"Welcome back, {username}! Your level: {levels}, score: {points}")
+else:
+    cur.execute("INSERT INTO user_data (username, score, level) VALUES (%s, %s, %s)", (username, 0, 0))
+    conn.commit()
+    print(f"New user {username} created.")
 pygame.init()
 
 # Размеры величин
@@ -20,7 +50,7 @@ body = [
 ]
 zone = pygame.image.load("images/zone.png")
 apple = pygame.image.load("pixils/apple.png")
-big = pygame.image.load("big1.png")
+big = pygame.image.load("big2.png")
 # Шрифт для текста уровня и очков
 myfont = pygame.font.Font("fonts/Boldonse-Regular.ttf", 20)
 
@@ -73,7 +103,12 @@ while running:
                 change_to = "LEFT"
             elif event.key == pygame.K_RIGHT and direction != "LEFT":
                 change_to = "RIGHT"
-    
+            elif event.key == pygame.K_SPACE:  # Клавиша для паузы и сохранения
+                cur.execute(
+                    "UPDATE user_data SET score = %s, level = %s WHERE username = %s",
+                    (points, levels, username)
+                )
+                conn.commit()
     # Движение змейки
     direction = change_to
     if direction == "UP":
@@ -96,7 +131,7 @@ while running:
     snake_body.insert(0, list(snake_pos))
 
     # Хавает ли змея еду
-    if snake_pos == apple_pos:
+    if snake_pos == apple_pos or snake_pos == list(map(lambda x: x + cell_size, apple_pos))  or snake_pos == list(map(lambda x: x-cell_size, apple_pos)) :
         points += food_weight
         if points % 3 == 0:
             levels += 1
@@ -154,6 +189,7 @@ while running:
 
     pygame.display.flip()
     clock.tick(speed)
-
+cur.close()
+conn.close()
 pygame.quit()
 sys.exit()
