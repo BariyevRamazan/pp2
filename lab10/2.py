@@ -103,7 +103,7 @@ while running:
                 change_to = "LEFT"
             elif event.key == pygame.K_RIGHT and direction != "LEFT":
                 change_to = "RIGHT"
-            elif event.key == pygame.K_SPACE:  # Клавиша для паузы и сохранения
+            elif event.key == pygame.K_SPACE:  
                 cur.execute(
                     "UPDATE user_data SET score = %s, level = %s WHERE username = %s",
                     (points, levels, username)

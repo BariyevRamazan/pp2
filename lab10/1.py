@@ -86,9 +86,14 @@ def delete():
         )
     conn.commit()
     print("Deleted!")
-
+def clear():
+    cur.execute(
+        "TRUNCATE TABLE Breaking_bad RESTART IDENTITY;"
+    )
+    print('Cleared!')
+    conn.commit()
 while True:
-        print("1.Create 2.CSV 3.Console 4.Update 5.Search 6.Delete 7.Exit")
+        print("1.Create 2.CSV 3.Console 4.Update 5.Search 6.Delete 7.Clear 8.Exit")
         option = input("Choose option: ")
         if option == "1":
             table()
@@ -102,8 +107,10 @@ while True:
             search()
         elif option == "6":
             delete()
-        elif option == "7":
+        elif option == "8":
             break
+        elif option == "7":
+            clear()
         else:
             print("NOT VALID")
 
